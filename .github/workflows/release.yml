@@ -1,9 +1,12 @@
 name: Release
 
-# v1.2.3 のようなタグを push すると、Windows 版 zip と自動更新用 app.zip を作ってリリースに添付する
+# v1.2.3 のようなタグを push するか、GitHub 上でリリースを公開すると、
+# Windows 版 zip と自動更新用 app.zip を作ってリリースに添付する
 on:
   push:
     tags: ["v*"]
+  release:
+    types: [published]
 
 permissions:
   contents: write
