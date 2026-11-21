@@ -1,0 +1,30 @@
+name: Release
+
+# v1.2.3 のようなタグを push すると、Windows 版 zip と自動更新用 app.zip を作ってリリースに添付する
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check version.txt matches tag
+        run: |
+          test "v$(tr -d '[:space:]' < app/version.txt)" = "${GITHUB_REF_NAME}"
+      - name: Build
+        run: python tools/build_windows.py
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file CHANGELOG_LATEST.md
+          gh release upload "$GITHUB_REF_NAME" dist/*.zip --clobber
