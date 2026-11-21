@@ -1,33 +1,48 @@
 name: Release
 
-# v1.2.3 のようなタグを push するか、GitHub 上でリリースを公開すると、
-# Windows 版 zip と自動更新用 app.zip を作ってリリースに添付する
+# main の app/version.txt の番号が上がったら、そのバージョンのリリースを自動で作る。
+# Windows 版 zip（初回配布用）と app.zip（自動更新用）を添付する。
 on:
   push:
-    tags: ["v*"]
-  release:
-    types: [published]
+    branches: [main]
+    paths: ["app/**", "CHANGELOG_LATEST.md", "tools/**", ".github/workflows/release.yml"]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
+      - name: Read version
+        id: v
+        run: |
+          V="v$(tr -d '[:space:]' < app/version.txt)"
+          echo "tag=$V" >> "$GITHUB_OUTPUT"
+          if gh release view "$V" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "$V はリリース済みなのでスキップします"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/setup-python@v5
+        if: steps.v.outputs.exists == 'false'
         with:
           python-version: "3.12"
-      - name: Check version.txt matches tag
-        run: |
-          test "v$(tr -d '[:space:]' < app/version.txt)" = "${GITHUB_REF_NAME}"
       - name: Build
+        if: steps.v.outputs.exists == 'false'
         run: python tools/build_windows.py
       - name: Publish release
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: steps.v.outputs.exists == 'false'
         run: |
-          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file CHANGELOG_LATEST.md
-          gh release upload "$GITHUB_REF_NAME" dist/*.zip --clobber
+          gh release create "${{ steps.v.outputs.tag }}" dist/*.zip \
+            --target "$GITHUB_SHA" --title "${{ steps.v.outputs.tag }}" \
+            --notes-file CHANGELOG_LATEST.md

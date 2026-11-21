@@ -22,8 +22,8 @@ Python のインストールは不要です。2回目以降は、起動時に自
 
 ## 新しいバージョンを出す手順
 1. `app/version.txt` の番号を上げ、`CHANGELOG_LATEST.md` に変更点を書く
-2. `git tag v<番号>` を push する
-3. GitHub Actions が Windows 版 zip と自動更新用 `app.zip` を作ってリリースに添付します。
+2. main に入れる（push またはプルリクエストのマージ）
+3. GitHub Actions が Windows 版 zip と自動更新用 `app.zip` を作り、`v<番号>` のリリースを公開します。
    配布済みのツールは次回起動時に更新を案内します。
 
 自動更新は `app/update_config.json` に書かれたリポジトリの最新リリースにある `app.zip` を見ています。
