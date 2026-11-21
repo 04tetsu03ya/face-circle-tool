@@ -4,7 +4,7 @@
 
 ## ダウンロード（Windows）
 [最新リリース](https://github.com/04tetsu03ya/face-circle-tool/releases/latest) から
-`顔丸切り抜きツール_Windows版.zip` をダウンロードし、展開して `顔丸切り抜きツール.bat` をダブルクリックします。
+`FaceCircleTool_Windows.zip` をダウンロードし、展開して `顔丸切り抜きツール.bat` をダブルクリックします。
 Python のインストールは不要です。2回目以降は、起動時に自動で更新を確認します。
 
 ## できること

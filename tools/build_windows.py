@@ -4,7 +4,7 @@
 Linux / Mac / Windows どこでも実行できます（Windows 用のファイルをダウンロードして組み立てるだけ）。
 
     python tools/build_windows.py
-    → dist/顔丸切り抜きツール_Windows版.zip  （初回配布用・Python 込み）
+    → dist/FaceCircleTool_Windows.zip       （初回配布用・Python 込み）
     → dist/app.zip                          （自動更新用・app フォルダの中身だけ）
 """
 from __future__ import annotations
@@ -81,7 +81,7 @@ def build_full_zip() -> Path:
     shutil.copy2(ROOT / "tools" / "launcher.bat", base / f"{TOP}.bat")
     shutil.copy2(ROOT / "tools" / "はじめにお読みください.txt", base / "はじめにお読みください.txt")
 
-    out = DIST / f"{TOP}_Windows版.zip"
+    out = DIST / "FaceCircleTool_Windows.zip"  # GitHub は日本語のファイル名を消すので英字にする
     print("zip を作成中…")
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
         for p in sorted(base.rglob("*")):
